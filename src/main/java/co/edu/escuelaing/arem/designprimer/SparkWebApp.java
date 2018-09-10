@@ -5,19 +5,31 @@
  */
 package co.edu.escuelaing.arem.designprimer;
 
+import spark.Request;
+import spark.Response;
 import static spark.Spark.*;
+import edu.escuelaing.arem.ASE.app.collections.LinkedList;
+import edu.escuelaing.arem.math.*;
+import java.util.ArrayList;
+import java.util.Scanner;
 
 /**
  *
  * @author 2114816
  */
 public class SparkWebApp {
+    
+    static Stat mean = new Stat();
+    static StandardDeviation standard = new StandardDeviation();
 
     public static void main(String[] args) {
         port(getPort());
         get("/hello", (req, res) -> "Hello Heroku");
         get("/", (req, res) -> "Hello slash");
         get("/formulario", (req, res) -> formPage());
+        get("/action_page", (req, res) -> actionPage(req, res));
+        
+        
     }
 
     static int getPort() {
@@ -31,13 +43,47 @@ public class SparkWebApp {
         String respuesta = "<!DOCTYPE html>\n"
                 + "<html>\n"
                 + "<body>\n"
+                + "<h2>Calcula promedio y desviacion estandar de una lista de datos</h2>\n"
                 + "\n"
-                + "<h1>My First Heading</h1>\n"
+                + "<form action=\"/action_page\">\n"
+                + "  Lista de datos:<br>\n"
+                + "  <input type=\"text\"name=\"datos\" value=\"0.0\">\n"
+                + "  <br>\n"
+                + "<br><br>\n"
+                + "  <input type=\"submit\" value=\"Submit\">"
+                + "</form> \n"
                 + "\n"
-                + "<p>My first paragraph.</p>\n"
-                + "\n"
+                + "<p>If you click the \"Submit\" button, the form-data will be sent to a page called \"/action_page\".</p>"
                 + "</body>\n"
                 + "</html>";
         return respuesta;
     }
+
+    private static String actionPage(Request req, Response res) {
+        String datos = req.queryParams("datos");
+        
+        Scanner scanner = new Scanner(datos);
+        
+        ArrayList<Double> lista = new ArrayList<Double>();
+        
+        while (scanner.hasNext()) {
+            if (scanner.hasNextDouble()) {
+                lista.add(scanner.nextDouble());
+            } else {
+                scanner.next();
+            }
+        }
+        
+        LinkedList<Double> l = new LinkedList<Double>(lista);
+        
+        double average = mean.mean(l);
+        double standardD = standard.standardD(l);
+        String respuesta =  "<h2>Mean: </h2>" 
+                            + average 
+                            + "\n </br>"
+                            + "<h2>Standard deviation: </h2>" 
+                            + standardD;
+        return respuesta;
+    }
+    
 }
