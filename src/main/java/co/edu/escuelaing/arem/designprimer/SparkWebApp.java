@@ -24,9 +24,7 @@ public class SparkWebApp {
 
     public static void main(String[] args) {
         port(getPort());
-        get("/hello", (req, res) -> "Hello Heroku");
-        get("/", (req, res) -> "Hello slash");
-        get("/formulario", (req, res) -> formPage());
+        get("/", (req, res) -> formPage());
         get("/action_page", (req, res) -> actionPage(req, res));
         
         
